@@ -19,6 +19,7 @@ class WebViewController: UIViewController, WKScriptMessageHandler, WKUIDelegate,
         let webConfiguration = WKWebViewConfiguration()
         webConfiguration.preferences.javaScriptEnabled = true
         webConfiguration.preferences.javaScriptCanOpenWindowsAutomatically = true
+        
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -35,13 +36,20 @@ class WebViewController: UIViewController, WKScriptMessageHandler, WKUIDelegate,
             }
         }
         WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0), completionHandler:{ })
-        
-        // inject JS to capture console.log output and send to iOS
-        let source = "function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;"
-        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-        webView.configuration.userContentController.addUserScript(script)
-        
+
+        // 1. Enables native app features in the client application
+        // 2. inject JS to capture console.log output and send to iOS
+        var texts: [String] = []
+        texts.append("window.enableNativeAppFeatures({type: 'IOS', biometricType: 'Touch', biometricIDEnabled: false, NFCSupported: false})")
+        texts.append("function captureLog(msg) { window.webkit.messageHandlers.logHandler.postMessage(msg); } window.console.log = captureLog;")
+        for text in texts {
+            let source = text
+            let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
+            webView.configuration.userContentController.addUserScript(script)
+        }
+
         // register the bridge script that listens for the output
+        webView.configuration.userContentController.add(self, name: "setToken")
         webView.configuration.userContentController.add(self, name: "logHandler")
     }
 
@@ -53,18 +61,13 @@ class WebViewController: UIViewController, WKScriptMessageHandler, WKUIDelegate,
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("message name: " + message.name)
         if message.name == "logHandler" {
-            let PREFIX = "__TOKEN: "
-            let msg: String = "\(message.body)"
-            //print("log message: \(msg)")
-            if msg.starts(with: PREFIX) {
-                let jwtToken: String = "\(msg.dropFirst(PREFIX.count))"
-                //print("JWT: \(jwtToken)")
-                dismiss(animated: true, completion: nil)
-                if let completion = completionHandler {
-                    completion(["jwt-token": jwtToken, "x-auth-token": "here"])
-                }
+            print("console log: \(message.body)")
+        } else if (message.name == "setToken") {
+            let token = "\(message.body)"
+            dismiss(animated: true, completion: nil)
+            if let completion = completionHandler {
+                completion(["token": token])
             }
         }
     }

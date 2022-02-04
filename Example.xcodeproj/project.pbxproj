@@ -25,7 +25,7 @@
 		431838BA27AA772500BAC5B2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		431838BD27AA772500BAC5B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		431838BF27AA772500BAC5B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		431838C527AA776100BAC5B2 /* Auth */ = {isa = PBXFileReference; lastKnownFileType = text; name = Auth; sourceTree = SOURCE_ROOT; };
+		436FEDFB27AD16BD00D6230C /* Auth */ = {isa = PBXFileReference; lastKnownFileType = text; name = Auth; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 		431838B027AA772200BAC5B2 /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				431838C527AA776100BAC5B2 /* Auth */,
+				436FEDFB27AD16BD00D6230C /* Auth */,
 				431838B127AA772200BAC5B2 /* AppDelegate.swift */,
 				431838B327AA772200BAC5B2 /* SceneDelegate.swift */,
 				431838B527AA772200BAC5B2 /* ViewController.swift */,
